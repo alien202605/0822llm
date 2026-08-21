@@ -1,0 +1,7 @@
+{
+  "name": "agent alien 知识库",
+  "description": "企业级 LLM Wiki 知识库管理系统与架构规划工作台，基于 GitHub 中文开源信息自动化获取中枢、Agent 编译引擎与 qmd 混合检索",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

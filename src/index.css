@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Mechanical Gear Spin Animations */
+  @keyframes gear-spin-cw {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes gear-spin-ccw {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+
+  @keyframes gear-spin-slow-cw {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes gear-spin-fast-cw {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Laser Pipeline Particle Flow */
+  @keyframes pipeline-flow-fast {
+    0% { stroke-dashoffset: 60; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  @keyframes pipeline-flow-reverse {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 60; }
+  }
+
+  /* Piston Stroke Animation */
+  @keyframes piston-pump {
+    0%, 100% { transform: translateY(0px) scaleY(1); }
+    50% { transform: translateY(-8px) scaleY(1.15); }
+  }
+
+  @keyframes pressure-gauge-needle {
+    0% { transform: rotate(-45deg); }
+    50% { transform: rotate(35deg); }
+    70% { transform: rotate(20deg); }
+    100% { transform: rotate(-45deg); }
+  }
+
+  /* Industrial Steam & Sparks */
+  @keyframes steam-puff {
+    0% { opacity: 0; transform: translateY(0) scale(0.6); }
+    40% { opacity: 0.8; transform: translateY(-12px) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-24px) scale(1.6); }
+  }
+
+  @keyframes energy-pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.6)); }
+    50% { filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.9)); }
+  }
+
+  .animate-gear-cw {
+    animation: gear-spin-cw 12s linear infinite;
+  }
+  .animate-gear-ccw {
+    animation: gear-spin-ccw 12s linear infinite;
+  }
+  .animate-gear-slow-cw {
+    animation: gear-spin-slow-cw 24s linear infinite;
+  }
+  .animate-gear-slow-ccw {
+    animation: gear-spin-ccw 24s linear infinite;
+  }
+  .animate-gear-fast-cw {
+    animation: gear-spin-fast-cw 4s linear infinite;
+  }
+  .animate-gear-fast-ccw {
+    animation: gear-spin-ccw 4s linear infinite;
+  }
+
+  .animate-piston {
+    animation: piston-pump 2s ease-in-out infinite;
+  }
+
+  .animate-gauge {
+    animation: pressure-gauge-needle 4s ease-in-out infinite;
+  }
+
+  .animate-pipe-flow {
+    stroke-dasharray: 8 6;
+    animation: pipeline-flow-fast 1.2s linear infinite;
+  }
+
+  .animate-pipe-flow-fast {
+    stroke-dasharray: 10 5;
+    animation: pipeline-flow-fast 0.6s linear infinite;
+  }
+
+  .animate-pipe-flow-reverse {
+    stroke-dasharray: 8 6;
+    animation: pipeline-flow-reverse 1.2s linear infinite;
+  }
+
+  .animate-steam {
+    animation: steam-puff 3s ease-out infinite;
+  }
+
+  .animate-energy-pulse {
+    animation: energy-pulse-glow 2.5s ease-in-out infinite;
+  }
+}
