@@ -321,7 +321,7 @@ export const WikiNetworkView: React.FC<WikiNetworkViewProps> = ({
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => {
-                          const uri = `obsidian://open?vault=${encodeURIComponent('OmniWiki-Enterprise-Vault')}&file=${encodeURIComponent(selectedPage.path)}`;
+                          const uri = `obsidian://open?vault=${encodeURIComponent('f324a1ec05d72a6f')}&file=${encodeURIComponent(selectedPage.path)}`;
                           navigator.clipboard?.writeText(uri);
                           window.location.href = uri;
                         }}

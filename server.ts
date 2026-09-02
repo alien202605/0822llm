@@ -1,7 +1,8 @@
-import express from "express";
+﻿import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import routes from "./src/api/routes";
 
 let aiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI | null {
@@ -29,7 +30,7 @@ function parseRssFeed(xmlText: string): Array<{ title: string; link: string; des
   
   for (const itemXml of itemMatches.slice(0, 10)) {
     const titleMatch = itemXml.match(/<title[^>]*>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/title>/i);
-    const title = titleMatch ? stripHtml(titleMatch[1] || titleMatch[2] || '') : '最新线索快讯';
+    const title = titleMatch ? stripHtml(titleMatch[1] || titleMatch[2] || '') : '鏈€鏂扮嚎绱㈠揩璁?;
 
     const linkMatch = itemXml.match(/<link[^>]*href=["'](.*?)["']/i) || itemXml.match(/<link[^>]*>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/link>/i);
     const link = linkMatch ? (linkMatch[1] || linkMatch[2] || '').trim() : 'https://rsshub.app/';
@@ -52,7 +53,7 @@ function parseRssFeed(xmlText: string): Array<{ title: string; link: string; des
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3456;
 
   app.use(express.json());
 
@@ -144,12 +145,12 @@ async function startServer() {
 
               if (Array.isArray(list)) {
                 parsedArticles = list.slice(0, 8).map((item: any, i: number) => ({
-                  title: item.title || item.name || item.text || `热点资讯 #${i + 1}`,
-                  source: `${task.connectorName || '开源数据流'}`,
+                  title: item.title || item.name || item.text || `鐑偣璧勮 #${i + 1}`,
+                  source: `${task.connectorName || '寮€婧愭暟鎹祦'}`,
                   pubDate: item.pubDate || item.time || new Date().toLocaleString(),
                   snippet: item.desc || item.description || item.snippet || item.title || '',
                   url: item.url || item.link || task.targetEndpoint,
-                  aiTags: [task.category || '热点']
+                  aiTags: [task.category || '鐑偣']
                 }));
               }
             } catch (e) {
@@ -160,11 +161,11 @@ async function startServer() {
             const feedItems = parseRssFeed(rawFetchedText);
             parsedArticles = feedItems.map(item => ({
               title: item.title,
-              source: `${task.connectorName || 'RSSHub'} 订阅流`,
+              source: `${task.connectorName || 'RSSHub'} 璁㈤槄娴乣,
               pubDate: item.pubDate,
               snippet: item.description,
               url: item.link,
-              aiTags: [task.category || '科技快讯']
+              aiTags: [task.category || '绉戞妧蹇']
             }));
           } else {
             // HTML / text via Jina Reader proxy fallback
@@ -181,11 +182,11 @@ async function startServer() {
                 if (headingMatches.length > 0) {
                   parsedArticles = headingMatches.slice(0, 6).map((m, i) => ({
                     title: m[1].trim(),
-                    source: `${task.connectorName || 'Crawl4AI/网页'}`,
+                    source: `${task.connectorName || 'Crawl4AI/缃戦〉'}`,
                     pubDate: new Date().toLocaleString(),
                     snippet: jinaMd.slice(m.index || 0, (m.index || 0) + 200).replace(/###?\s+.+/, '').trim(),
                     url: task.targetEndpoint,
-                    aiTags: [task.category || '网页资讯']
+                    aiTags: [task.category || '缃戦〉璧勮']
                   }));
                 }
               }
@@ -203,69 +204,69 @@ async function startServer() {
         const now = new Date();
         const dateStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
         
-        if (task.category === '科技新闻' || task.connectorId === 'rsshub') {
+        if (task.category === '绉戞妧鏂伴椈' || task.connectorId === 'rsshub') {
           parsedArticles = [
             {
-              title: '开源社区发布下一代高吞吐 Agent 状态机调度框架，支持复杂双链知识回填',
-              source: `${task.connectorName} (实时订阅)`,
+              title: '寮€婧愮ぞ鍖哄彂甯冧笅涓€浠ｉ珮鍚炲悙 Agent 鐘舵€佹満璋冨害妗嗘灦锛屾敮鎸佸鏉傚弻閾剧煡璇嗗洖濉?,
+              source: `${task.connectorName} (瀹炴椂璁㈤槄)`,
               pubDate: `${dateStr} 14:10`,
-              snippet: '该框架实现了任务全生命周期的自愈与错误恢复，将多智能体协作延迟降低 38%，并原生支持 Obsidian 与 Markdown 知识库标准...',
+              snippet: '璇ユ鏋跺疄鐜颁簡浠诲姟鍏ㄧ敓鍛藉懆鏈熺殑鑷剤涓庨敊璇仮澶嶏紝灏嗗鏅鸿兘浣撳崗浣滃欢杩熼檷浣?38%锛屽苟鍘熺敓鏀寔 Obsidian 涓?Markdown 鐭ヨ瘑搴撴爣鍑?..',
               url: 'https://github.com/trending/ai-agent-state-machine',
-              aiTags: ['Agent架构', '开源生态', '高并发']
+              aiTags: ['Agent鏋舵瀯', '寮€婧愮敓鎬?, '楂樺苟鍙?]
             },
             {
-              title: '国内主流大模型完成长文本结构化蒸馏突破，知识库检索精准率提升至 96.8%',
-              source: `${task.connectorName} (实时订阅)`,
+              title: '鍥藉唴涓绘祦澶фā鍨嬪畬鎴愰暱鏂囨湰缁撴瀯鍖栬捀棣忕獊鐮达紝鐭ヨ瘑搴撴绱㈢簿鍑嗙巼鎻愬崌鑷?96.8%',
+              source: `${task.connectorName} (瀹炴椂璁㈤槄)`,
               pubDate: `${dateStr} 13:45`,
-              snippet: '在企业级私有知识库评测基准中，新架构显著降低了知识幻觉率，并支持自动提取 Frontmatter 实体标签...',
+              snippet: '鍦ㄤ紒涓氱骇绉佹湁鐭ヨ瘑搴撹瘎娴嬪熀鍑嗕腑锛屾柊鏋舵瀯鏄捐憲闄嶄綆浜嗙煡璇嗗够瑙夌巼锛屽苟鏀寔鑷姩鎻愬彇 Frontmatter 瀹炰綋鏍囩...',
               url: 'https://36kr.com/p/2026082101',
-              aiTags: ['大模型', 'RAG', '精准检索']
+              aiTags: ['澶фā鍨?, 'RAG', '绮惧噯妫€绱?]
             },
             {
-              title: '最新边缘算力加速卡全面兼容 Linux 容器编排，降低私有知识库部署成本',
-              source: `${task.connectorName} (实时订阅)`,
+              title: '鏈€鏂拌竟缂樼畻鍔涘姞閫熷崱鍏ㄩ潰鍏煎 Linux 瀹瑰櫒缂栨帓锛岄檷浣庣鏈夌煡璇嗗簱閮ㄧ讲鎴愭湰',
+              source: `${task.connectorName} (瀹炴椂璁㈤槄)`,
               pubDate: `${dateStr} 12:30`,
-              snippet: '针对中小企业私有化部署痛点，新款芯片实现了单卡支持 32 路并发推理与即时 Markdown 向量化...',
+              snippet: '閽堝涓皬浼佷笟绉佹湁鍖栭儴缃茬棝鐐癸紝鏂版鑺墖瀹炵幇浜嗗崟鍗℃敮鎸?32 璺苟鍙戞帹鐞嗕笌鍗虫椂 Markdown 鍚戦噺鍖?..',
               url: 'https://36kr.com/p/2026082102',
-              aiTags: ['算力芯片', '私有化部署', '低成本']
+              aiTags: ['绠楀姏鑺墖', '绉佹湁鍖栭儴缃?, '浣庢垚鏈?]
             }
           ];
-        } else if (task.category === '金融财经' || task.connectorId === 'akshare') {
+        } else if (task.category === '閲戣瀺璐㈢粡' || task.connectorId === 'akshare') {
           parsedArticles = [
             {
-              title: '央行等七部门联合发布关于推进数字金融与新质生产力发展的指导意见',
-              source: `${task.connectorName} (实时数据)`,
+              title: '澶绛変竷閮ㄩ棬鑱斿悎鍙戝竷鍏充簬鎺ㄨ繘鏁板瓧閲戣瀺涓庢柊璐ㄧ敓浜у姏鍙戝睍鐨勬寚瀵兼剰瑙?,
+              source: `${task.connectorName} (瀹炴椂鏁版嵁)`,
               pubDate: `${dateStr} 09:30`,
-              snippet: '政策强调加大对高端制造、绿色低碳及企业数字化知识中枢建设的信贷支持与直接融资便利...',
+              snippet: '鏀跨瓥寮鸿皟鍔犲ぇ瀵归珮绔埗閫犮€佺豢鑹蹭綆纰冲強浼佷笟鏁板瓧鍖栫煡璇嗕腑鏋㈠缓璁剧殑淇¤捶鏀寔涓庣洿鎺ヨ瀺璧勪究鍒?..',
               url: 'http://www.pbc.gov.cn/goutongjiaoliu/2026082101',
-              aiTags: ['货币政策', '新质生产力', '数字金融']
+              aiTags: ['璐у竵鏀跨瓥', '鏂拌川鐢熶骇鍔?, '鏁板瓧閲戣瀺']
             },
             {
-              title: '半导体与智能算力产业链早盘资金大幅流入，多只龙头股估值中枢上移',
-              source: `${task.connectorName} (实时行情)`,
+              title: '鍗婂浣撲笌鏅鸿兘绠楀姏浜т笟閾炬棭鐩樿祫閲戝ぇ骞呮祦鍏ワ紝澶氬彧榫欏ご鑲′及鍊间腑鏋笂绉?,
+              source: `${task.connectorName} (瀹炴椂琛屾儏)`,
               pubDate: `${dateStr} 10:15`,
-              snippet: '券商最新研报指出，受全球企业级 AI Agent 落地加速驱动，算力供应链与核心服务器需求持续超预期...',
+              snippet: '鍒稿晢鏈€鏂扮爺鎶ユ寚鍑猴紝鍙楀叏鐞冧紒涓氱骇 AI Agent 钀藉湴鍔犻€熼┍鍔紝绠楀姏渚涘簲閾句笌鏍稿績鏈嶅姟鍣ㄩ渶姹傛寔缁秴棰勬湡...',
               url: 'http://stock.eastmoney.com/a/2026082102.html',
-              aiTags: ['A股行情', '算力供应链', '券商研报']
+              aiTags: ['A鑲¤鎯?, '绠楀姏渚涘簲閾?, '鍒稿晢鐮旀姤']
             }
           ];
         } else {
           parsedArticles = [
             {
-              title: `全网热议：${task.keywordsFilter[0] || '企业AI知识库'} 落地最佳实践与标准工作流`,
-              source: `${task.connectorName} (热榜聚合)`,
+              title: `鍏ㄧ綉鐑锛?{task.keywordsFilter[0] || '浼佷笟AI鐭ヨ瘑搴?} 钀藉湴鏈€浣冲疄璺典笌鏍囧噯宸ヤ綔娴乣,
+              source: `${task.connectorName} (鐑鑱氬悎)`,
               pubDate: `${dateStr} 11:20`,
-              snippet: `在知乎与各大技术社区引发广泛讨论，重点聚焦于知识自动化采集、去重过滤与 Obsidian 双链知识网络的有机结合...`,
+              snippet: `鍦ㄧ煡涔庝笌鍚勫ぇ鎶€鏈ぞ鍖哄紩鍙戝箍娉涜璁猴紝閲嶇偣鑱氱劍浜庣煡璇嗚嚜鍔ㄥ寲閲囬泦銆佸幓閲嶈繃婊や笌 Obsidian 鍙岄摼鐭ヨ瘑缃戠粶鐨勬湁鏈虹粨鍚?..`,
               url: task.targetEndpoint,
-              aiTags: ['热门讨论', '最佳实践', '工作流']
+              aiTags: ['鐑棬璁ㄨ', '鏈€浣冲疄璺?, '宸ヤ綔娴?]
             },
             {
-              title: `行业洞察：开源工具链如何重构企业级信息监控与情报分析流程`,
-              source: `${task.connectorName} (数据采集)`,
+              title: `琛屼笟娲炲療锛氬紑婧愬伐鍏烽摼濡備綍閲嶆瀯浼佷笟绾т俊鎭洃鎺т笌鎯呮姤鍒嗘瀽娴佺▼`,
+              source: `${task.connectorName} (鏁版嵁閲囬泦)`,
               pubDate: `${dateStr} 10:05`,
-              snippet: `分析了 RSSHub、TodayDailyHot 与 Crawl4AI 等开源项目在私有化场景下的架构优势与安全性保障...`,
+              snippet: `鍒嗘瀽浜?RSSHub銆乀odayDailyHot 涓?Crawl4AI 绛夊紑婧愰」鐩湪绉佹湁鍖栧満鏅笅鐨勬灦鏋勪紭鍔夸笌瀹夊叏鎬т繚闅?..`,
               url: task.targetEndpoint,
-              aiTags: ['开源架构', '私有化', '安全合规']
+              aiTags: ['寮€婧愭灦鏋?, '绉佹湁鍖?, '瀹夊叏鍚堣']
             }
           ];
         }
@@ -273,7 +274,7 @@ async function startServer() {
 
       // 2. Keyword filtering
       const kws = (task.keywordsFilter || []).map((k: string) => k.trim().toLowerCase()).filter(Boolean);
-      if (kws.length > 0 && !kws.includes('全部') && !kws.includes('all')) {
+      if (kws.length > 0 && !kws.includes('鍏ㄩ儴') && !kws.includes('all')) {
         const matched = parsedArticles.filter(art =>
           kws.some((kw: string) =>
             art.title.toLowerCase().includes(kw) ||
@@ -295,25 +296,23 @@ async function startServer() {
       let aiSummaryText = "";
       let generatedWikiTitle = "";
       let generatedWikiContent = "";
-      let generatedTags: string[] = ['自动任务', task.category || '情报'];
+      let generatedTags: string[] = ['鑷姩浠诲姟', task.category || '鎯呮姤'];
 
       if (gemini) {
         try {
           console.log("[Gemini API] Processing auto-ingestion with gemini-3.7-flash...");
-          const prompt = `你是一个企业级自动化知识库与 Obsidian 智能体引擎。
-我们刚通过开源数据管道【${task.connectorName}】（端点：${task.targetEndpoint}）抓取了以下最新信息：
+          const prompt = `浣犳槸涓€涓紒涓氱骇鑷姩鍖栫煡璇嗗簱涓?Obsidian 鏅鸿兘浣撳紩鎿庛€?鎴戜滑鍒氶€氳繃寮€婧愭暟鎹閬撱€?{task.connectorName}銆戯紙绔偣锛?{task.targetEndpoint}锛夋姄鍙栦簡浠ヤ笅鏈€鏂颁俊鎭細
 
-${parsedArticles.map((a, i) => `${i + 1}. 标题：${a.title}\n   来源：${a.source}\n   时间：${a.pubDate}\n   摘要：${a.snippet}\n   链接：${a.url}`).join('\n\n')}
+${parsedArticles.map((a, i) => `${i + 1}. 鏍囬锛?{a.title}\n   鏉ユ簮锛?{a.source}\n   鏃堕棿锛?{a.pubDate}\n   鎽樿锛?{a.snippet}\n   閾炬帴锛?{a.url}`).join('\n\n')}
 
-用户的提炼指令：
-${task.aiSummaryPrompt || "提取核心事实要点，指出涉及主体、创新突破与业务影响，并生成双链。"}
+鐢ㄦ埛鐨勬彁鐐兼寚浠わ細
+${task.aiSummaryPrompt || "鎻愬彇鏍稿績浜嬪疄瑕佺偣锛屾寚鍑烘秹鍙婁富浣撱€佸垱鏂扮獊鐮翠笌涓氬姟褰卞搷锛屽苟鐢熸垚鍙岄摼銆?}
 
-请以 JSON 格式输出以下字段（不要输出多余 markdown 围栏以外的解释）：
-{
-  "summary": "150字左右的综合分析与核心事实提炼",
-  "keyTags": ["标签1", "标签2", "标签3"],
-  "wikiPageTitle": "适合作为知识库词条的标题",
-  "wikiMarkdown": "符合 Obsidian 规范的完整 Markdown 内容，包含 ## 核心事实摘要、## 关键技术/商业解析、## 业务影响与行动建议、## 关联实体与双链（使用 [[wiki/...]] 格式关联）"
+璇蜂互 JSON 鏍煎紡杈撳嚭浠ヤ笅瀛楁锛堜笉瑕佽緭鍑哄浣?markdown 鍥存爮浠ュ鐨勮В閲婏級锛?{
+  "summary": "150瀛楀乏鍙崇殑缁煎悎鍒嗘瀽涓庢牳蹇冧簨瀹炴彁鐐?,
+  "keyTags": ["鏍囩1", "鏍囩2", "鏍囩3"],
+  "wikiPageTitle": "閫傚悎浣滀负鐭ヨ瘑搴撹瘝鏉＄殑鏍囬",
+  "wikiMarkdown": "绗﹀悎 Obsidian 瑙勮寖鐨勫畬鏁?Markdown 鍐呭锛屽寘鍚?## 鏍稿績浜嬪疄鎽樿銆?# 鍏抽敭鎶€鏈?鍟嗕笟瑙ｆ瀽銆?# 涓氬姟褰卞搷涓庤鍔ㄥ缓璁€?# 鍏宠仈瀹炰綋涓庡弻閾撅紙浣跨敤 [[wiki/...]] 鏍煎紡鍏宠仈锛?
 }`;
 
           const response = await gemini.models.generateContent({
@@ -327,7 +326,7 @@ ${task.aiSummaryPrompt || "提取核心事实要点，指出涉及主体、创�
           const resJsonText = response.text || "{}";
           const parsed = JSON.parse(resJsonText);
           aiSummaryText = parsed.summary || "";
-          generatedWikiTitle = parsed.wikiPageTitle || parsedArticles[0]?.title || "自动化信息快报";
+          generatedWikiTitle = parsed.wikiPageTitle || parsedArticles[0]?.title || "鑷姩鍖栦俊鎭揩鎶?;
           generatedWikiContent = parsed.wikiMarkdown || "";
           if (Array.isArray(parsed.keyTags) && parsed.keyTags.length > 0) {
             generatedTags = Array.from(new Set([...generatedTags, ...parsed.keyTags]));
@@ -339,52 +338,51 @@ ${task.aiSummaryPrompt || "提取核心事实要点，指出涉及主体、创�
 
       // Algorithmic Fallback if Gemini did not produce content
       if (!generatedWikiContent) {
-        generatedWikiTitle = `${task.name} · ${dateOnly} 动态汇编`;
-        aiSummaryText = `本期通过「${task.connectorName}」采集引擎成功捕获 ${parsedArticles.length} 条高价值信息线索。核心聚焦点涵盖：${parsedArticles.map(p => p.title.slice(0, 15)).join('、')}。已完成去噪与结构化实体提取。`;
-        generatedWikiContent = `## 1. 核心事实要点 (Executive Summary)
+        generatedWikiTitle = `${task.name} 路 ${dateOnly} 鍔ㄦ€佹眹缂朻;
+        aiSummaryText = `鏈湡閫氳繃銆?{task.connectorName}銆嶉噰闆嗗紩鎿庢垚鍔熸崟鑾?${parsedArticles.length} 鏉￠珮浠峰€间俊鎭嚎绱€傛牳蹇冭仛鐒︾偣娑电洊锛?{parsedArticles.map(p => p.title.slice(0, 15)).join('銆?)}銆傚凡瀹屾垚鍘诲櫔涓庣粨鏋勫寲瀹炰綋鎻愬彇銆俙;
+        generatedWikiContent = `## 1. 鏍稿績浜嬪疄瑕佺偣 (Executive Summary)
 ${aiSummaryText}
 
-## 2. 详细采集线索清单
+## 2. 璇︾粏閲囬泦绾跨储娓呭崟
 ${parsedArticles.map((a, i) => `### ${i + 1}. ${a.title}
-- **采集来源**: ${a.source}
-- **发布时间**: ${a.pubDate}
-- **原始链接**: [${a.url}](${a.url})
-- **核心要点**: ${a.snippet}
-- **相关标签**: ${a.aiTags.map(t => `#${t}`).join(' ')}
+- **閲囬泦鏉ユ簮**: ${a.source}
+- **鍙戝竷鏃堕棿**: ${a.pubDate}
+- **鍘熷閾炬帴**: [${a.url}](${a.url})
+- **鏍稿績瑕佺偣**: ${a.snippet}
+- **鐩稿叧鏍囩**: ${a.aiTags.map(t => `#${t}`).join(' ')}
 `).join('\n')}
 
-## 3. 业务影响与知识网络关联
-- 本次自动化抓取已自动将实体索引挂载至企业知识中枢
-- 推荐关联知识词条: [[wiki/intelligence/tech-news/ai-brief.md]], [[wiki/sops/agent-workflow.md]], [[wiki/terms/karpathy-llm-wiki.md]]
-- 下次调度周期: **${task.cronSchedule}**
+## 3. 涓氬姟褰卞搷涓庣煡璇嗙綉缁滃叧鑱?- 鏈鑷姩鍖栨姄鍙栧凡鑷姩灏嗗疄浣撶储寮曟寕杞借嚦浼佷笟鐭ヨ瘑涓灑
+- 鎺ㄨ崘鍏宠仈鐭ヨ瘑璇嶆潯: [[wiki/intelligence/tech-news/ai-brief.md]], [[wiki/sops/agent-workflow.md]], [[wiki/terms/karpathy-llm-wiki.md]]
+- 涓嬫璋冨害鍛ㄦ湡: **${task.cronSchedule}**
 `;
       }
 
       // Construct Real Raw Document
       const rawFileName = `${dateOnly}_${task.id}_${Date.now().toString().slice(-4)}.md`;
       const rawFilePath = `${task.targetRawFolder || 'raw/auto-tasks/'}${rawFileName}`;
-      const rawDocContent = `# ${task.name} - 采集原始记录 (${dateOnly} ${timeStr})
+      const rawDocContent = `# ${task.name} - 閲囬泦鍘熷璁板綍 (${dateOnly} ${timeStr})
 
-> **自动化引擎**: ${task.connectorName} (${task.connectorId})  
-> **数据端点**: [${task.targetEndpoint}](${task.targetEndpoint})  
-> **采集时间**: ${dateOnly} ${timeStr}  
-> **过滤关键词**: ${task.keywordsFilter.join(', ')}  
-> **状态**: ✅ 已清洗、去噪并生成知识库双链  
+> **鑷姩鍖栧紩鎿?*: ${task.connectorName} (${task.connectorId})  
+> **鏁版嵁绔偣**: [${task.targetEndpoint}](${task.targetEndpoint})  
+> **閲囬泦鏃堕棿**: ${dateOnly} ${timeStr}  
+> **杩囨护鍏抽敭璇?*: ${task.keywordsFilter.join(', ')}  
+> **鐘舵€?*: 鉁?宸叉竻娲椼€佸幓鍣苟鐢熸垚鐭ヨ瘑搴撳弻閾? 
 
 ---
 
-## 采集线索原始数据
+## 閲囬泦绾跨储鍘熷鏁版嵁
 ${parsedArticles.map((a, idx) => `
 ### [${idx + 1}] ${a.title}
-- **来源**: ${a.source}
-- **时间**: ${a.pubDate}
+- **鏉ユ簮**: ${a.source}
+- **鏃堕棿**: ${a.pubDate}
 - **URL**: ${a.url}
-- **摘要**: ${a.snippet}
-- **AI 标签**: ${a.aiTags.join(', ')}
+- **鎽樿**: ${a.snippet}
+- **AI 鏍囩**: ${a.aiTags.join(', ')}
 `).join('\n')}
 
 ---
-*由企业级自动任务引擎调度生成*`;
+*鐢变紒涓氱骇鑷姩浠诲姟寮曟搸璋冨害鐢熸垚*`;
 
       // Construct Clean Wiki Page
       const wikiSlug = (generatedWikiTitle || 'auto-intelligence')
@@ -400,13 +398,13 @@ ${parsedArticles.map((a, idx) => `
         path: wikiFilePath,
         fileName: wikiFileName,
         frontmatter: {
-          title: generatedWikiTitle || `${task.name} 综述`,
+          title: generatedWikiTitle || `${task.name} 缁艰堪`,
           type: 'intelligence' as const,
           created_at: dateOnly,
           updated_at: dateOnly,
           sources: parsedArticles.map(a => a.url).filter(Boolean),
           tags: generatedTags,
-          aliases: [task.name, `${task.connectorName} 动态`],
+          aliases: [task.name, `${task.connectorName} 鍔ㄦ€乣],
           status: 'active' as const
         },
         content: generatedWikiContent,
@@ -441,7 +439,7 @@ ${generatedWikiContent}`,
         compiledPagesCount: task.autoCompileToWiki ? 1 : 0,
         compiledPagePaths: task.autoCompileToWiki ? [wikiFilePath] : [],
         sourceDevice: `${task.connectorName} Engine`,
-        sourceCategory: task.category || '自动化采集',
+        sourceCategory: task.category || '鑷姩鍖栭噰闆?,
         parserMeta: {
           wordCount: rawDocContent.length,
           originalFormat: 'md' as const,
@@ -454,7 +452,7 @@ ${generatedWikiContent}`,
       // Set compiled wiki path in sample articles
       parsedArticles[0].compiledWikiPath = wikiFilePath;
 
-      const logMessage = `[${timeStr}] 「${task.connectorName}」自动管道运行完成：抓取 ${parsedArticles.length} 条有效信息，已编织入 ${wikiFilePath}`;
+      const logMessage = `[${timeStr}] 銆?{task.connectorName}銆嶈嚜鍔ㄧ閬撹繍琛屽畬鎴愶細鎶撳彇 ${parsedArticles.length} 鏉℃湁鏁堜俊鎭紝宸茬紪缁囧叆 ${wikiFilePath}`;
 
       res.json({
         success: true,
@@ -500,7 +498,7 @@ ${generatedWikiContent}`,
       const markdownContent = await response.text();
       
       // Extract title from markdown h1 or fallback to URL pathname
-      let title = "【在线抓取】企业知识库同步文档";
+      let title = "銆愬湪绾挎姄鍙栥€戜紒涓氱煡璇嗗簱鍚屾鏂囨。";
       const h1Match = markdownContent.match(/^#\s+(.+)$/m);
       if (h1Match && h1Match[1]) {
         title = h1Match[1].trim();
@@ -509,9 +507,9 @@ ${generatedWikiContent}`,
           const urlObj = new URL(url);
           const pathSegments = urlObj.pathname.split('/').filter(Boolean);
           if (pathSegments.length > 0) {
-            title = `[飞书/网页] ${pathSegments[pathSegments.length - 1]}`;
+            title = `[椋炰功/缃戦〉] ${pathSegments[pathSegments.length - 1]}`;
           } else {
-            title = `在线抓取网页: ${urlObj.hostname}`;
+            title = `鍦ㄧ嚎鎶撳彇缃戦〉: ${urlObj.hostname}`;
           }
         } catch {
           title = url;
@@ -537,35 +535,30 @@ ${generatedWikiContent}`,
       
       // Intelligent fallback parser for Feishu / specific URLs
       const targetUrl = req.body.url || 'https://my.feishu.cn/';
-      let fallbackTitle = '在线网页与飞书云文档';
+      let fallbackTitle = '鍦ㄧ嚎缃戦〉涓庨涔︿簯鏂囨。';
       try {
         const u = new URL(targetUrl);
-        fallbackTitle = `[实时同步] 飞书云文档与协作网页 (${u.hostname})`;
+        fallbackTitle = `[瀹炴椂鍚屾] 椋炰功浜戞枃妗ｄ笌鍗忎綔缃戦〉 (${u.hostname})`;
       } catch {
         fallbackTitle = targetUrl;
       }
 
       const liveFallbackMarkdown = `# ${fallbackTitle}
 
-> **真实目标网址**: [${targetUrl}](${targetUrl})  
-> **采集时间**: ${new Date().toLocaleString()}  
-> **通信协议**: HTTPS / Feishu OpenAPI & Jina Reader Proxy  
-> **状态**: ✅ 实时在线抓取与并网成功
-
+> **鐪熷疄鐩爣缃戝潃**: [${targetUrl}](${targetUrl})  
+> **閲囬泦鏃堕棿**: ${new Date().toLocaleString()}  
+> **閫氫俊鍗忚**: HTTPS / Feishu OpenAPI & Jina Reader Proxy  
+> **鐘舵€?*: 鉁?瀹炴椂鍦ㄧ嚎鎶撳彇涓庡苟缃戞垚鍔?
 ---
 
-> [!NOTE] 实时抓取提示
-> 系统已成功建立与目标网址 \`${targetUrl}\` 的通信连接。由于部分企业飞书文档设置了访问权限或单点登录（SSO），后端已为您生成结构化代理正文，并自动注入双链网络。
-
-## 1. 抓取正文摘要
-目标文档已成功解析，以下为从目标网址同步的结构化内容片段：
-
-- **文档唯一标识 (Token)**: \`${targetUrl.split('/').pop() || 'STSXdSxViozwZtxjpufc5uJ4nQb'}\`
-- **关联业务部门**: 核心研发与跨部门协同中心
-- **自动化操作**: 已自动剥离侧边栏 DOM 噪音、转存高清图表附件、并生成 YAML Frontmatter。
-
-## 2. 架构代码与配置
-\`\`\`json
+> [!NOTE] 瀹炴椂鎶撳彇鎻愮ず
+> 绯荤粺宸叉垚鍔熷缓绔嬩笌鐩爣缃戝潃 \`${targetUrl}\` 鐨勯€氫俊杩炴帴銆傜敱浜庨儴鍒嗕紒涓氶涔︽枃妗ｈ缃簡璁块棶鏉冮檺鎴栧崟鐐圭櫥褰曪紙SSO锛夛紝鍚庣宸蹭负鎮ㄧ敓鎴愮粨鏋勫寲浠ｇ悊姝ｆ枃锛屽苟鑷姩娉ㄥ叆鍙岄摼缃戠粶銆?
+## 1. 鎶撳彇姝ｆ枃鎽樿
+鐩爣鏂囨。宸叉垚鍔熻В鏋愶紝浠ヤ笅涓轰粠鐩爣缃戝潃鍚屾鐨勭粨鏋勫寲鍐呭鐗囨锛?
+- **鏂囨。鍞竴鏍囪瘑 (Token)**: \`${targetUrl.split('/').pop() || 'STSXdSxViozwZtxjpufc5uJ4nQb'}\`
+- **鍏宠仈涓氬姟閮ㄩ棬**: 鏍稿績鐮斿彂涓庤法閮ㄩ棬鍗忓悓涓績
+- **鑷姩鍖栨搷浣?*: 宸茶嚜鍔ㄥ墺绂讳晶杈规爮 DOM 鍣煶銆佽浆瀛橀珮娓呭浘琛ㄩ檮浠躲€佸苟鐢熸垚 YAML Frontmatter銆?
+## 2. 鏋舵瀯浠ｇ爜涓庨厤缃?\`\`\`json
 {
   "targetUrl": "${targetUrl}",
   "syncStatus": "active",
@@ -575,7 +568,7 @@ ${generatedWikiContent}`,
 \`\`\`
 
 ---
-*本文档由企业自动化知识库中枢实时在线抓取并编织进 Obsidian 知识网络*`;
+*鏈枃妗ｇ敱浼佷笟鑷姩鍖栫煡璇嗗簱涓灑瀹炴椂鍦ㄧ嚎鎶撳彇骞剁紪缁囪繘 Obsidian 鐭ヨ瘑缃戠粶*`;
 
       res.json({
         success: true,
@@ -646,18 +639,18 @@ ${generatedWikiContent}`,
     {
       id: "hitl-001",
       sourceDocId: "raw-pdf-003",
-      sourceDocTitle: "企业级多模态知识图谱构建规范.pdf",
-      candidateTitle: "多模态 DAG 节点编译标准",
+      sourceDocTitle: "浼佷笟绾у妯℃€佺煡璇嗗浘璋辨瀯寤鸿鑼?pdf",
+      candidateTitle: "澶氭ā鎬?DAG 鑺傜偣缂栬瘧鏍囧噯",
       targetPath: "wiki/sops/multimodal_dag_compile_spec.md",
       entityType: "SOP",
-      summary: "从技术白皮书中提炼的多模态版式分析与实体三元组提取作业规程，包含 OCR 置信度门限与错误告警链。",
+      summary: "浠庢妧鏈櫧鐨功涓彁鐐肩殑澶氭ā鎬佺増寮忓垎鏋愪笌瀹炰綋涓夊厓缁勬彁鍙栦綔涓氳绋嬶紝鍖呭惈 OCR 缃俊搴﹂棬闄愪笌閿欒鍛婅閾俱€?,
       linkReasons: [
-        { target: "wiki/terms/LayoutLMv3.md", reason: "定义用于版式结构识别的深度视觉骨干模型" },
-        { target: "wiki/sops/deployment_v2.md", reason: "依赖该部署规程提供 GPU 推理服务" }
+        { target: "wiki/terms/LayoutLMv3.md", reason: "瀹氫箟鐢ㄤ簬鐗堝紡缁撴瀯璇嗗埆鐨勬繁搴﹁瑙夐骞叉ā鍨? },
+        { target: "wiki/sops/deployment_v2.md", reason: "渚濊禆璇ラ儴缃茶绋嬫彁渚?GPU 鎺ㄧ悊鏈嶅姟" }
       ],
       diffContent: {
         op: "CREATE",
-        newContent: `# 多模态 DAG 节点编译标准\n\n> 来源：[[raw/pdfs/企业级多模态知识图谱构建规范.pdf]] | 状态：审定中\n\n## 1. 核心编译流程\n1. 接收不可变 Raw 原始流\n2. 触发 LayoutLMv3 进行版式分析\n3. 执行 Frontmatter 强校验与 link_reason 注入\n\n---\n*OmniWiki HITL 知识复利合成*`
+        newContent: `# 澶氭ā鎬?DAG 鑺傜偣缂栬瘧鏍囧噯\n\n> 鏉ユ簮锛歔[raw/pdfs/浼佷笟绾у妯℃€佺煡璇嗗浘璋辨瀯寤鸿鑼?pdf]] | 鐘舵€侊細瀹″畾涓璡n\n## 1. 鏍稿績缂栬瘧娴佺▼\n1. 鎺ユ敹涓嶅彲鍙?Raw 鍘熷娴乗n2. 瑙﹀彂 LayoutLMv3 杩涜鐗堝紡鍒嗘瀽\n3. 鎵ц Frontmatter 寮烘牎楠屼笌 link_reason 娉ㄥ叆\n\n---\n*OmniWiki HITL 鐭ヨ瘑澶嶅埄鍚堟垚*`
       },
       confidenceScore: 0.94,
       status: "PENDING_APPROVAL",
@@ -667,18 +660,18 @@ ${generatedWikiContent}`,
     {
       id: "hitl-002",
       sourceDocId: "raw-feishu-002",
-      sourceDocTitle: "AI Agent 跨部门协同落地复盘",
-      candidateTitle: "PAI 认知计算架构",
+      sourceDocTitle: "AI Agent 璺ㄩ儴闂ㄥ崗鍚岃惤鍦板鐩?,
+      candidateTitle: "PAI 璁ょ煡璁＄畻鏋舵瀯",
       targetPath: "wiki/terms/pai_architecture.md",
       entityType: "Term",
-      summary: "基于文件系统的 AI 长期记忆模型（Personal AI Infrastructure），通过不可变 Raw 与结构化 Wiki 实现低幻觉自愈。",
+      summary: "鍩轰簬鏂囦欢绯荤粺鐨?AI 闀挎湡璁板繂妯″瀷锛圥ersonal AI Infrastructure锛夛紝閫氳繃涓嶅彲鍙?Raw 涓庣粨鏋勫寲 Wiki 瀹炵幇浣庡够瑙夎嚜鎰堛€?,
       linkReasons: [
-        { target: "wiki/concepts/Knowledge_Compounding.md", reason: "作为知识复利理论的物理工程载体" }
+        { target: "wiki/concepts/Knowledge_Compounding.md", reason: "浣滀负鐭ヨ瘑澶嶅埄鐞嗚鐨勭墿鐞嗗伐绋嬭浇浣? }
       ],
       diffContent: {
         op: "UPDATE",
-        oldContent: `# PAI 架构 (旧版本)\n简易的 AI 对话记录缓存。`,
-        newContent: `# PAI 认知计算架构 (v2.1)\n\n基于三层物理解耦的 LLM Wiki 自进化知识架构，支持 qmd 混合检索与 Ingest 编译期合成。`
+        oldContent: `# PAI 鏋舵瀯 (鏃х増鏈?\n绠€鏄撶殑 AI 瀵硅瘽璁板綍缂撳瓨銆俙,
+        newContent: `# PAI 璁ょ煡璁＄畻鏋舵瀯 (v2.1)\n\n鍩轰簬涓夊眰鐗╃悊瑙ｈ€︾殑 LLM Wiki 鑷繘鍖栫煡璇嗘灦鏋勶紝鏀寔 qmd 娣峰悎妫€绱笌 Ingest 缂栬瘧鏈熷悎鎴愩€俙
       },
       confidenceScore: 0.98,
       status: "PENDING_APPROVAL",
@@ -716,7 +709,7 @@ ${generatedWikiContent}`,
 
       res.json({
         success: true,
-        message: `配置 [${module}.${key}] 已动态更新`,
+        message: `閰嶇疆 [${module}.${key}] 宸插姩鎬佹洿鏂癭,
         config: runtimeConfig,
         timestamp: new Date().toISOString()
       });
@@ -749,13 +742,13 @@ ${generatedWikiContent}`,
 
     // Default sample wiki catalog for DQL sandbox execution
     const catalog = [
-      { file: "wiki/sops/deployment_v2.md", title: "模型集群灰度发布 SOP", type: "SOP", status: "active", tags: ["部署", "集群", "SOP"], lastUpdated: "2026-08-20", biLinks: 5, author: "DevOps Team" },
-      { file: "wiki/sops/billing_process.md", title: "企业财务报销 SOP", type: "SOP", status: "active", tags: ["财务", "报销", "合规"], lastUpdated: "2026-08-18", biLinks: 3, author: "Finance AI" },
-      { file: "wiki/products/omniwiki_spec.md", title: "OmniWiki 企业版技术规格", type: "Product", status: "critical", tags: ["知识库", "企业级", "LLM"], lastUpdated: "2026-08-21", biLinks: 12, author: "Architecture Dept" },
-      { file: "wiki/projects/agent_aliens.md", title: "Agent Aliens 智能体矩阵复盘", type: "Project", status: "review", tags: ["Agent", "Multi-Agent", "复盘"], lastUpdated: "2026-08-15", biLinks: 7, author: "AI Lab" },
-      { file: "wiki/terms/LayoutLMv3.md", title: "LayoutLMv3 多模态版式引擎", type: "Term", status: "active", tags: ["OCR", "多模态", "深度学习"], lastUpdated: "2026-08-19", biLinks: 9, author: "Compiler Daemon" },
-      { file: "wiki/terms/qmd_search.md", title: "qmd 混合检索架构", type: "Term", status: "active", tags: ["BM25", "Vector", "检索"], lastUpdated: "2026-08-21", biLinks: 11, author: "Search Team" },
-      { file: "wiki/syntheses/rag_vs_wiki.md", title: "静态 RAG 与编译 Wiki 效能对比", type: "Synthesis", status: "active", tags: ["RAG", "LLM Wiki", "评测"], lastUpdated: "2026-08-21", biLinks: 14, author: "Synthesis Engine" }
+      { file: "wiki/sops/deployment_v2.md", title: "妯″瀷闆嗙兢鐏板害鍙戝竷 SOP", type: "SOP", status: "active", tags: ["閮ㄧ讲", "闆嗙兢", "SOP"], lastUpdated: "2026-08-20", biLinks: 5, author: "DevOps Team" },
+      { file: "wiki/sops/billing_process.md", title: "浼佷笟璐㈠姟鎶ラ攢 SOP", type: "SOP", status: "active", tags: ["璐㈠姟", "鎶ラ攢", "鍚堣"], lastUpdated: "2026-08-18", biLinks: 3, author: "Finance AI" },
+      { file: "wiki/products/omniwiki_spec.md", title: "OmniWiki 浼佷笟鐗堟妧鏈鏍?, type: "Product", status: "critical", tags: ["鐭ヨ瘑搴?, "浼佷笟绾?, "LLM"], lastUpdated: "2026-08-21", biLinks: 12, author: "Architecture Dept" },
+      { file: "wiki/projects/agent_aliens.md", title: "Agent Aliens 鏅鸿兘浣撶煩闃靛鐩?, type: "Project", status: "review", tags: ["Agent", "Multi-Agent", "澶嶇洏"], lastUpdated: "2026-08-15", biLinks: 7, author: "AI Lab" },
+      { file: "wiki/terms/LayoutLMv3.md", title: "LayoutLMv3 澶氭ā鎬佺増寮忓紩鎿?, type: "Term", status: "active", tags: ["OCR", "澶氭ā鎬?, "娣卞害瀛︿範"], lastUpdated: "2026-08-19", biLinks: 9, author: "Compiler Daemon" },
+      { file: "wiki/terms/qmd_search.md", title: "qmd 娣峰悎妫€绱㈡灦鏋?, type: "Term", status: "active", tags: ["BM25", "Vector", "妫€绱?], lastUpdated: "2026-08-21", biLinks: 11, author: "Search Team" },
+      { file: "wiki/syntheses/rag_vs_wiki.md", title: "闈欐€?RAG 涓庣紪璇?Wiki 鏁堣兘瀵规瘮", type: "Synthesis", status: "active", tags: ["RAG", "LLM Wiki", "璇勬祴"], lastUpdated: "2026-08-21", biLinks: 14, author: "Synthesis Engine" }
     ];
 
     // Simple DQL Parser for TABLE and LIST queries
@@ -842,7 +835,7 @@ ${generatedWikiContent}`,
           {
             id: "audit-101",
             timestamp: "14:42:10",
-            task: "Frontmatter 强校验与死链 Lint 巡检",
+            task: "Frontmatter 寮烘牎楠屼笌姝婚摼 Lint 宸℃",
             routedTo: "Local Ollama (Port 11434)",
             latencyMs: 142,
             tokensAvoided: 8400,
@@ -851,7 +844,7 @@ ${generatedWikiContent}`,
           {
             id: "audit-102",
             timestamp: "14:38:05",
-            task: "孤立专有名词占位符草稿自愈",
+            task: "瀛ょ珛涓撴湁鍚嶈瘝鍗犱綅绗﹁崏绋胯嚜鎰?,
             routedTo: "Local Ollama (Port 11434)",
             latencyMs: 210,
             tokensAvoided: 12500,
@@ -860,7 +853,7 @@ ${generatedWikiContent}`,
           {
             id: "audit-103",
             timestamp: "14:15:32",
-            task: "跨文档综合对比研报 (Synthesis)",
+            task: "璺ㄦ枃妗ｇ患鍚堝姣旂爺鎶?(Synthesis)",
             routedTo: "Cloud Gemini Flash / GPT-4o",
             latencyMs: 1250,
             tokensAvoided: 0,
@@ -869,7 +862,7 @@ ${generatedWikiContent}`,
           {
             id: "audit-104",
             timestamp: "13:50:18",
-            task: "YAML 标签格式化与 Markdown 表格对齐",
+            task: "YAML 鏍囩鏍煎紡鍖栦笌 Markdown 琛ㄦ牸瀵归綈",
             routedTo: "Local Ollama (Port 11434)",
             latencyMs: 98,
             tokensAvoided: 5300,
@@ -904,24 +897,24 @@ ${generatedWikiContent}`,
     const mockCorpus = [
       {
         path: "wiki/sops/travel-reimbursement.md",
-        title: "企业差旅报销与补贴标准 SOP",
-        snippet: "一线城市（北上广深、杭州、成都）差旅生活补贴上调为 220 元/人/天，二线及其他城市 160 元/人/天...",
+        title: "浼佷笟宸梾鎶ラ攢涓庤ˉ璐存爣鍑?SOP",
+        snippet: "涓€绾垮煄甯傦紙鍖椾笂骞挎繁銆佹澀宸炪€佹垚閮斤級宸梾鐢熸椿琛ヨ创涓婅皟涓?220 鍏?浜?澶╋紝浜岀嚎鍙婂叾浠栧煄甯?160 鍏?浜?澶?..",
         bm25Score: 9.2,
         vectorScore: 0.99,
         hybridScore: 0.985
       },
       {
         path: "wiki/terms/per-diem.md",
-        title: "[Term] Per Diem (差旅生活补贴)",
-        snippet: "Per Diem 指员工因公出差期间按天定额发放的膳食与杂费补贴，无需凭发票报销。",
+        title: "[Term] Per Diem (宸梾鐢熸椿琛ヨ创)",
+        snippet: "Per Diem 鎸囧憳宸ュ洜鍏嚭宸湡闂存寜澶╁畾棰濆彂鏀剧殑鑶抽涓庢潅璐硅ˉ璐达紝鏃犻渶鍑彂绁ㄦ姤閿€銆?,
         bm25Score: 8.4,
         vectorScore: 0.92,
         hybridScore: 0.912
       },
       {
         path: "wiki/syntheses/travel-summary.md",
-        title: "2026 Q3 差旅制度调整及财务合规综述",
-        snippet: "为进一步简化财务报销流程，经 2026 年 8 月管理层合规审议，差旅生活补贴标准进行全面优化升级...",
+        title: "2026 Q3 宸梾鍒跺害璋冩暣鍙婅储鍔″悎瑙勭患杩?,
+        snippet: "涓鸿繘涓€姝ョ畝鍖栬储鍔℃姤閿€娴佺▼锛岀粡 2026 骞?8 鏈堢鐞嗗眰鍚堣瀹¤锛屽樊鏃呯敓娲昏ˉ璐存爣鍑嗚繘琛屽叏闈紭鍖栧崌绾?..",
         bm25Score: 7.8,
         vectorScore: 0.88,
         hybridScore: 0.864
@@ -967,14 +960,59 @@ ${generatedWikiContent}`,
     });
   });
 
+  app.use("/api/v2", routes);
+app.use('/api/v2/local-files', localFileRouter);
+
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
 
+  // MCP Server (鐭ヨ瘑搴撳澶栨绱㈠伐鍏? - Streamable HTTP 浼犺緭
+  if (process.env.ENABLE_MCP !== 'false') {
+    try {
+      const mcpPath = process.env.MCP_HTTP_PATH || '/mcp';
+      const { registerMcpServer } = await import('./src/mcp/server');
+      registerMcpServer(app, mcpPath);
+      console.log(`[MCP] Server mounted at http://localhost:${PORT}${mcpPath}`);
+    } catch (err: any) {
+      console.warn('[MCP] Failed to mount server:', err.message);
+    }
+  }
+
+  // 闈欐€佽祫婧愶細鍦ㄥ紑鍙戠幆澧冧篃鐩存帴鎵樼鏍圭洰褰曚笅鐨勭嫭绔?HTML 鍥捐氨椤碉紝閬垮厤琚?Vite SPA 鎺ョ鑰?404
+  // 浠呮斁琛岀櫧鍚嶅崟鍐呯殑闈欐€佹枃浠讹紝闃叉鏆撮湶婧愮爜
+  const staticWhitelist = new Set([
+    'knowledge-graph.html',
+    'knowledge-graph-v2.html',
+    'enhanced-knowledge-graph.html',
+    'knowledge-graph-v2.html.bak',
+    '3d-graph.html',
+  ]);
+  app.use((req, res, next) => {
+    const fname = String(req.path || '').replace(/^\//, '');
+    if (staticWhitelist.has(fname)) {
+      return res.sendFile(path.join(process.cwd(), fname));
+    }
+    return next();
+  });
+  // 鍏佽璁块棶 docs/architecture.html 绛夋枃妗ｉ潤鎬佽祫婧?  app.use('/docs', express.static(path.join(process.cwd(), 'docs')));
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        proxy: {
+          "/api/v2": {
+            target: "http://localhost:" + PORT,
+            changeOrigin: true,
+          },
+          "/api": {
+            target: "http://localhost:" + PORT,
+            changeOrigin: true,
+          },
+        },
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);
@@ -988,7 +1026,18 @@ ${generatedWikiContent}`,
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
+        // Start file watcher for auto-ingest from raw/docs
+    try {
+      const { fileWatcherService } = await import('./src/services/fileWatcher');
+      fileWatcherService.startWatching();
+      console.log('[FileWatcher] Auto-ingest service started');
+    } catch (err: any) {
+      console.warn('[FileWatcher] Failed to start:', err.message);
+    }
+  }, 1500);
   });
 }
 
 startServer();
+
+

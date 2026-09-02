@@ -107,4 +107,48 @@
   .animate-energy-pulse {
     animation: energy-pulse-glow 2.5s ease-in-out infinite;
   }
+
+  /* Live Stream Ticker Scroll (Bottom-Up, like stock market ticker) */
+  @keyframes ticker-scroll-up {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+
+  .animate-ticker-scroll {
+    animation: ticker-scroll-up 30s linear infinite;
+  }
+
+  .animate-ticker-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  /* Custom Scrollbar for Sidebar - Matches Dark Theme */
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 4px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.4);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.6);
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb:active {
+    background: rgba(99, 102, 241, 0.8);
+  }
+
+  /* Firefox scrollbar */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.4) rgba(15, 23, 42, 0.5);
+  }
 }

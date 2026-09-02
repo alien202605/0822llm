@@ -6,3 +6,27 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Temp debug files
+*.bak
+*.corrupted
+debug.txt
+dir_out.txt
+test_fs.txt
+test_write.txt
+_debug_*.txt
+_dir_*.txt
+_esbuild_*.txt
+_main_*.txt
+_manifest_*.txt
+_obsidian_*.txt
+_output.txt
+_package_*.txt
+_project_*.txt
+_result.txt
+_styles_*.txt
+_test_*.txt
+_tsconfig.txt
+_version_*.txt
+*_*.cjs
+*_*.mjs

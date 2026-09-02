@@ -46,6 +46,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
   const [hoveredNode, setHoveredNode] = useState<NodePosition | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
   const [showRawNodes, setShowRawNodes] = useState<boolean>(true);
+  const [isControlPanelCollapsed, setIsControlPanelCollapsed] = useState<boolean>(false);
 
   // Graph state references
   const nodesRef = useRef<NodePosition[]>([]);
@@ -428,7 +429,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
       {/* Canvas & Node Detail Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Graph Canvas (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-2 shadow-sm relative overflow-hidden flex items-center justify-center">
+        <div className={`${isControlPanelCollapsed ? 'lg:col-span-12' : 'lg:col-span-8'} bg-white rounded-2xl border border-slate-200 p-2 shadow-sm relative overflow-hidden flex items-center justify-center`}>
           <canvas
             ref={canvasRef}
             width={780}
@@ -443,8 +444,18 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
           </div>
         </div>
 
-        {/* Selected Node Details Card (4 cols) */}
+        {/* Control Panel (4 cols) */}
         <div className="lg:col-span-4 space-y-4">
+          <button
+            onClick={() => setIsControlPanelCollapsed(!isControlPanelCollapsed)}
+            className="w-full flex items-center justify-center gap-2 text-xs font-mono py-1.5 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition shadow-sm"
+          >
+            <span className="text-base font-bold">{isControlPanelCollapsed ? '>' : '<'}</span>
+            <span>{isControlPanelCollapsed ? '展开控制面板' : '收起控制面板'}</span>
+          </button>
+
+          {!isControlPanelCollapsed && (
+            <div className="space-y-4">
           {selectedNode ? (
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
               <div className="space-y-1 border-b border-slate-100 pb-4">
@@ -526,6 +537,8 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
               </div>
             </div>
           </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

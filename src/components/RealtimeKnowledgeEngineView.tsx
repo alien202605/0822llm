@@ -368,51 +368,53 @@ export const RealtimeKnowledgeEngineView: React.FC<RealtimeKnowledgeEngineViewPr
             </div>
 
             {/* Stream List */}
-            <div className="space-y-3 max-h-[700px] overflow-y-auto pr-1">
-              {filteredIntelligence.map(item => {
-                const isSelected = selectedIntel.id === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => setSelectedIntel(item)}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500 shadow-md ring-1 ring-indigo-500/50'
-                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        {getSourceTypeBadge(item.sourceType)}
-                        {getImportanceBadge(item.importance)}
-                      </div>
-                      <span className="text-[11px] text-slate-400 flex items-center gap-1 whitespace-nowrap">
-                        <Clock className="w-3 h-3" />
-                        {item.capturedAt}
-                      </span>
-                    </div>
-
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white mt-2.5 line-clamp-2 leading-snug">
-                      {item.title}
-                    </h3>
-
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
-                      {item.summary}
-                    </p>
-
-                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
-                      <div className="flex items-center gap-1.5 truncate max-w-[240px]">
-                        <span className="font-mono text-[11px] text-indigo-500 dark:text-indigo-400 truncate">
-                          {item.sourceName}
+            <div className="space-y-3 overflow-hidden" style={{ maxHeight: '700px' }}>
+              <div className="animate-ticker-scroll" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[...filteredIntelligence, ...filteredIntelligence].map((item, idx) => {
+                  const isSelected = selectedIntel.id === item.id;
+                  return (
+                    <div
+                      key={`${item.id}-${idx}`}
+                      onClick={() => setSelectedIntel(item)}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500 shadow-md ring-1 ring-indigo-500/50'
+                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {getSourceTypeBadge(item.sourceType)}
+                          {getImportanceBadge(item.importance)}
+                        </div>
+                        <span className="text-[11px] text-slate-400 flex items-center gap-1 whitespace-nowrap">
+                          <Clock className="w-3 h-3" />
+                          {item.capturedAt}
                         </span>
                       </div>
-                      <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                        ⚡ {item.refreshLatencyMs}ms Refresh
-                      </span>
+
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white mt-2.5 line-clamp-2 leading-snug">
+                        {item.title}
+                      </h3>
+
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
+                        {item.summary}
+                      </p>
+
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+                        <div className="flex items-center gap-1.5 truncate max-w-[240px]">
+                          <span className="font-mono text-[11px] text-indigo-500 dark:text-indigo-400 truncate">
+                            {item.sourceName}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                          ⚡ {item.refreshLatencyMs}ms Refresh
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
 

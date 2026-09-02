@@ -6,11 +6,11 @@ import {
 } from '../types';
 
 export const DEFAULT_OBSIDIAN_CONFIG: ObsidianVaultConfig = {
-  vaultName: 'OmniWiki-Enterprise-Vault',
-  vaultLocalPath: '~/Documents/OmniWiki-Enterprise-Vault',
-  restApiEndpoint: 'https://127.0.0.1:27123',
-  restApiStatus: 'connected',
-  apiKey: 'ob_live_sec_994a38f72c4e56b10884ef',
+  vaultName: 'f324a1ec05d72a6f',
+  vaultLocalPath: 'E:\\2026\\obsidian\\wiki',
+  restApiEndpoint: 'http://127.0.0.1:27123',
+  restApiStatus: 'connecting',
+  apiKey: '',
   syncEngine: 'Obsidian Local REST API',
   activePlugins: [
     'obsidian-local-rest-api (v2.1.2)',
@@ -20,10 +20,10 @@ export const DEFAULT_OBSIDIAN_CONFIG: ObsidianVaultConfig = {
     'canvas-conversation (v1.0.8)',
     'templater-obsidian (v2.9.2)'
   ],
-  totalNotes: 148,
-  totalCanvasFiles: 6,
-  totalAttachments: 320,
-  lastSyncTime: '2026-08-18 19:00'
+  totalNotes: 59,
+  totalCanvasFiles: 0,
+  totalAttachments: 0,
+  lastSyncTime: '2026-08-26 12:30'
 };
 
 export const PRESET_OBSIDIAN_CANVASES: ObsidianCanvasFile[] = [

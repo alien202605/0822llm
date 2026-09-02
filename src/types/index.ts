@@ -17,7 +17,10 @@ export type TabType =
   | 'bot'
   | 'schema'
   | 'planning'
-  | 'intelligence';
+  | 'intelligence'
+  | 'integrations'
+  | 'admin'
+  | 'agent-tasks';
 
 export type IndustryArchetype = 'software_dev' | 'media_creative' | 'general_enterprise';
 
@@ -456,5 +459,29 @@ export interface DqlQueryResult {
   compiledQuery: string;
 }
 
+// Agent Auto Tasks (LLM Wiki Core Operations)
+export type AgentTaskCategory = 'ingest' | 'query' | 'lint' | 'maintenance' | 'intelligence';
+export type AgentTaskStatus = 'active' | 'paused' | 'running' | 'error';
+export type AgentTaskPriority = 'P0 核心' | 'P1 重要' | 'P2 辅助';
+
+export interface AgentAutoTask {
+  id: string;
+  name: string;
+  category: AgentTaskCategory;
+  priority: AgentTaskPriority;
+  status: AgentTaskStatus;
+  description: string;
+  loop: 'Ingest' | 'Query' | 'Lint' | 'Maintenance' | 'Intelligence';
+  cronSchedule: string;
+  lastRunTime: string;
+  nextRunTime: string;
+  totalRuns: number;
+  successCount: number;
+  failureCount: number;
+  targetPages: string[];
+  latestLogs: string[];
+  isEnabled: boolean;
+  autoExecute: boolean;
+}
 
 
